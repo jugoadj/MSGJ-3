@@ -1,0 +1,25 @@
+.box {
+    margin-left: 16px;
+    padding: 10px;
+    width: 100%;
+}
+
+@media screen and (min-width: 600px) {
+    .box.open {
+        
+        margin-left: 50px;
+    }
+}
+
+@media screen and (min-width: 900px) {
+    .box.open {
+        margin-left: 200px;
+    }
+}
+
+@media (min-width: 400px) {
+    .responsive-logo {
+        width: 20px;
+        margin-left: 20px;
+    }
+}
