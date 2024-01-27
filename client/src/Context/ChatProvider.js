@@ -31,10 +31,9 @@ useEffect(() => {
       console.error('User ID is null');
     }
   };
-
-  if (uid) { // Ajoutez cette vérification
+  
     fetchUserPseudo();
-  }
+  
 }, [uid]); // Ajoutez uid comme dépendance à useEffect
 
   return (

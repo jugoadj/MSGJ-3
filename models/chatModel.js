@@ -20,9 +20,10 @@ const chatModel = mongoose.Schema( //un modèle Mongoose pour une collection "ch
 
         type: mongoose.Schema.Types.ObjectId, ref: "User" 
     }],
+
     latestMessage: { //contient les id des messages associer a ce chat
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Message",
+      ref: "Message"
     },
     
   

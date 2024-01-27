@@ -21,11 +21,11 @@ const transferMessage = async (req, res) => {
   try {
     var message = await Message.create(newMessage); // crée un nouveau message dans la base de données 
 
-    message = await message.populate("sender", "name pic"); // peuple le champ sender (qui est un ID de l'utilisateur) avec les détails de l'utilisateur correspondant (nom et image).
+    message = await message.populate("sender", "name picture"); // peuple le champ sender (qui est un ID de l'utilisateur) avec les détails de l'utilisateur correspondant (nom et image).
     message = await message.populate("chat"); // peuple le champ chat (qui est un ID du chat) avec les détails du chat correspondant (nom et image).
     message = await UserModel.populate(message, {// peuple le champ chat.users (qui est un tableau d'ID d'utilisateurs) avec les détails des utilisateurs correspondants (nom, image et email). 
       path: "chat.users", 
-      select: "name pic email",
+      select: "name picture email",
     });
 
     await Chat.findByIdAndUpdate(req.body.chatId, { latestMessage: message } );// on met à jour le dernier message du chat dans la base de données.
@@ -49,7 +49,7 @@ const sendFiles = asyncHandler(async (req, res) => {
   }
 
   var newMessage = {
-    sender: res.locals.user._id, 
+    sender: req.params._id, 
     chat: chatId,
     file: file.path, // Le chemin du fichier téléchargé
   };
@@ -57,11 +57,11 @@ const sendFiles = asyncHandler(async (req, res) => {
   try {
     var message = await Message.create(newMessage); // crée un nouveau message dans la base de données 
     console.log("fichier enregistere dans la base de donnees");
-    message = await message.populate("sender", "name pic"); // peuple le champ sender (qui est un ID de l'utilisateur) avec les détails de l'utilisateur correspondant (nom et image).
+    message = await message.populate("sender", "name picture"); // peuple le champ sender (qui est un ID de l'utilisateur) avec les détails de l'utilisateur correspondant (nom et image).
     message = await message.populate("chat"); // peuple le champ chat (qui est un ID du chat) avec les détails du chat correspondant (nom et image).
     message = await UserModel.populate(message, {// peuple le champ chat.users (qui est un tableau d'ID d'utilisateurs) avec les détails des utilisateurs correspondants (nom, image et email). 
       path: "chat.users", 
-      select: "name pic email",
+      select: "name picture email",
     });
 
     await Chat.findByIdAndUpdate(chatId, { latestMessage: message });// on met à jour le dernier message du chat dans la base de données.
@@ -102,7 +102,7 @@ const sendMessage = asyncHandler(async (req, res) => {
   }
 
   var newMessage = {  //détails du message.
-    sender: res.locals.user._id, //l'id de l'utilisateur qui a envoyé le message qu'on a récupéré à partir du token d'authentification.
+    sender: req.params._id, //l'id de l'utilisateur qui a envoyé le message qu'on a récupéré à partir du token d'authentification.
     content: content,
     chat: chatId,
     
@@ -111,15 +111,14 @@ const sendMessage = asyncHandler(async (req, res) => {
   try {
     var message = await Message.create(newMessage); // crée un nouveau message dans la base de données 
 
-    message = await message.populate("sender", "name pic"); // peuple le champ sender (qui est un ID de l'utilisateur) avec les détails de l'utilisateur correspondant (nom et image).
+    message = await message.populate("sender", "pseudo picture"); // peuple le champ sender (qui est un ID de l'utilisateur) avec les détails de l'utilisateur correspondant (nom et image).
     message = await message.populate("chat"); // peuple le champ chat (qui est un ID du chat) avec les détails du chat correspondant (nom et image).
     message = await UserModel.populate(message, {// peuple le champ chat.users (qui est un tableau d'ID d'utilisateurs) avec les détails des utilisateurs correspondants (nom, image et email). 
       path: "chat.users", 
-      select: "name pic email",
+      select: "pseudo picture email",
     });
 
     await Chat.findByIdAndUpdate(req.body.chatId, { latestMessage: message });// on met à jour le dernier message du chat dans la base de données.
-
     res.json(message); //envoyer le message créé en réponse à la requête HTTP.
 
   } catch (error) {
@@ -135,7 +134,7 @@ const sendMessage = asyncHandler(async (req, res) => {
 const allMessages = asyncHandler(async (req, res) => {
   try {
     const messages = await Message.find({ chat: req.params.chatId })//  rechercher dans la base de données tous les messages qui ont un champ chat égal à req.params.chatId, qui est l'ID du chat passé dans l'URL de la requête. envoyer par le client depuis singleChat
-      .populate("sender", "name pic email") //remplace le champ sender (qui est un ID de l'utilisateur) par les détails de l'utilisateur correspondant (nom, image et email)
+      .populate("sender", "name picture email") //remplace le champ sender (qui est un ID de l'utilisateur) par les détails de l'utilisateur correspondant (nom, image et email)
       .populate("chat")
     res.json(messages); //envoyer les messages du chat récupérés en réponse à la requête HTTP donc a singlechat .
   } catch (error) {

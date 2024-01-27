@@ -20,11 +20,10 @@ const accessChat = asyncHandler(async (req, res) => {
     return res.sendStatus(400);
   }
   
-  var isChat = await Chat.find({// requete a la base données pour trouver un chat qui n'est pas un groupe et qui contient à la fois l'utilisateur 
-    //actuellement connecté (res.locals.user._id) et l'utilisateur spécifié par userId.
+  var isChat = await Chat.find({
     isGroupChat: false,
-    $and: [//
-      { users: { $elemMatch: { $eq: req.params._id._id} } }, //res.locals.user._id est l'utilisateur actuellement connecté.(authentifié) qu'on a stocker dans res.locals.user grace au middleware protect
+    $and: [
+      { users: { $elemMatch: { $eq: req.params._id} } },
       { users: { $elemMatch: { $eq: userId } } },
     ],
   })
@@ -33,8 +32,9 @@ const accessChat = asyncHandler(async (req, res) => {
 
   isChat = await UserModel.populate(isChat, { //appelle la méthode populate sur le modèle UserModel de Mongoose. Elle prend deux arguments : le document ou la liste de documents à peupler (dans ce cas, isChat), et un objet qui spécifie comment peupler les documents.
     path: "latestMessage.sender",
-    select: "name pic email",
+    select: "pseudo picture email",
   });
+  
 
   if (isChat.length > 0) { // si il ya pas de chat on renvoie un tableau vide sinon on renvoie le chat
     res.send(isChat[0]);
@@ -42,7 +42,7 @@ const accessChat = asyncHandler(async (req, res) => {
     var chatData = {
       chatName: req.body.name,
       isGroupChat: false,
-      users: [req.params._id._id, userId], // les users du chat sont l'utilisateur actuellement connecté et l'utilisateur spécifié par userId.(envoyer par la requete du client dans req.body)
+      users: [req.params._id, userId], // les users du chat sont l'utilisateur actuellement connecté et l'utilisateur spécifié par userId.(envoyer par la requete du client dans req.body)
     };
 
     try {
@@ -64,11 +64,7 @@ const accessChat = asyncHandler(async (req, res) => {
 //@access          Protected
 const fetchChats = asyncHandler(async (req, res) => {
   try {
-      if (!req.params._id) {
-          throw new Error('User not found in fetchChats');
-          
-      }
-        Chat.find({ users: { $elemMatch: { $eq: req.params._id} } })
+    Chat.find({ users: { $elemMatch: { $eq: req.params._id } } })
     // trouver tous les chats qui contiennent l'utilisateur actuellement connecté dans leur tableau users
       .populate("users", "-password")// remplit les informations des utilisateurs de chaque chat, à l'exception de leur mot de passe.
       .populate("latestMessage")// remplit les informations du dernier message de chaque chat par 
@@ -81,8 +77,6 @@ const fetchChats = asyncHandler(async (req, res) => {
         res.status(200).send(results);// on renvoie les resultats
       });
   } catch (error) {
-        console.error(error); // Log the error
-
     res.status(400);
     throw new Error(error.message);
   }
@@ -104,7 +98,7 @@ const createGroupChat = asyncHandler(async (req, res) => {
       .send("More than 2 users are required to form a group chat");
   }
 
-  users.push(res.locals.user);// on ajoute l'utilisateur actuellement connecté au groupe
+  users.push(req.params.user);// on ajoute l'utilisateur actuellement connecté au groupe
 
   //res.locals.user est l'utilisateur actuellement connecté.(authentifié) qu'on a stocker dans res.locals.user grace au middleware protect
 

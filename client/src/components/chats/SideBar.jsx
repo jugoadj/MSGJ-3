@@ -11,6 +11,11 @@ import Fab from '@mui/material/Fab';
 import msggImage from './msgg.png';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { SelectedChatContext } from '../../Context/ChatProvider'; 
+import { TextField } from "@mui/material";
+import { Button } from "@mui/material";
+import CreateGroupForm from "./GroupChat";
+
+
 
 
 
@@ -24,14 +29,38 @@ const StyledDrawer = styled(Drawer)`
 `
 
 const SideBar = ({ toggleDrawer, openDrawer}) => {
+      const [showForm, setShowForm] = useState(false);
+
     const apiUrl = process.env.REACT_APP_API_URL;
     const [loggedUser, setLoggedUser] = useState();//crée un état loggedUser avec une valeur initiale non définie. setLoggedUser est la fonction qui sera utilisée pour mettre à jour cet état
 
     const uid = useContext(UidContext);
 
     const { selectedChat, setSelectedChat, chats, setChats, loading, setLoading, user } = useContext(SelectedChatContext);
+    const [userId, setUserId] = useState('');
 
+    const [chatName, setChatName] = useState('');
+
+//        const createGroup = () => {
+//         try {
+
+//             setLoading(true);
+
+//             const { data } = axios.post(
+//                 `${apiUrl}api/chat/group/${uid}`,
+//                 { userId , chatName }
+
+                
+//             );
+//             setChats([data, ...chats]);
+//             setSelectedChat(data);
+//             setLoading(false);
+//         }
+//         catch (error) {
+//             console.error(error);
+//         }
     
+//   };
 
    
 
@@ -77,6 +106,7 @@ useEffect(() => {
             variant="persistent"
             sx={{
                 '& .MuiDrawer-paper': { 
+                    
                     width: 300,
                     marginLeft:8,
                     borderRight: 'none',
@@ -98,10 +128,14 @@ useEffect(() => {
             >
                 My Chats
                 
-                 <Fab margin="5px" color="black" aria-label="add"display="flex">
-                        <AddIcon style={{ color: 'black' }} />
+                 <div>
+                <Fab margin="5px" color="black" aria-label="add" display="flex" onClick={() => setShowForm(true)}>
+                    <AddIcon style={{ color: 'black' }} />
                 </Fab>
-                
+
+                {/* {showForm && <CreateGroupForm createGroup={createGroup} />} */}
+                </div>
+                            
             </Box>
             <Box sx={{ width: 300, height: '100%', overflow: 'auto' }}>
                 <Stack direction="column" spacing={2}  >
@@ -152,7 +186,9 @@ useEffect(() => {
                                                     </span> 
                                                 )
                                             ) : chat.latestMessage && chat.latestMessage.content.startsWith('data:audio') ? (
-                                                <span>
+                                                <span >
+                                                    <img src={chat.latestMessage.sender.picture} style={{ width: '30px', height: '30px', marginRight: '5px', borderRadius:"100%" }} />
+
                                                     { chat.latestMessage.sender._id === uid 
                                                         ? `Vous avez envoyé une audio à : ${chat.users.find(user => user._id !== uid).pseudo}` 
                                                         : <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -179,15 +215,16 @@ useEffect(() => {
                                                             </div>}
                                                 </span> 
                                             ) : chat.latestMessage ? (
-                                                <span style={{ display: 'flex', alignItems: 'center' }}>
-                                                    <img src={chat.latestMessage.sender.picture} style={{width: '30px', height: '30px', marginRight: '5px', borderRadius:"100%" }} />
+                                                <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                                    <p style={{fontFamily:"fantasy"}} >{chat.users.find(user => user._id !== uid).pseudo}</p>
+                                                    <img src={chat.users.find(user => user._id !== uid).picture} style={{width: '30px', height: '30px', marginRight: '5px', borderRadius:"100%" }} />
                                                     {chat.latestMessage.sender._id === uid 
                                                         ? "Vous"
                                                         : chat.latestMessage.sender.pseudo} 
                                                     : {chat.latestMessage.content.length > 50 
                                                         ? chat.latestMessage.content.substring(0, 35) + "..." 
                                                         : chat.latestMessage.content}
-                                                </span>
+                                                    </span>
                                             ) : `Démarrer une conversation avec 
                                                 ${chat.users.find(user => user._id !== uid).pseudo}`}
                                         </div>

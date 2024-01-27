@@ -12,14 +12,11 @@ module.exports.checkUser = (req, res, next) => {
       } else {
         let user = await UserModel.findById(decodedToken.id);
         res.locals.user = user;
-        console.log(res.locals.user)
-
         next();
       }
     });
   } else {
-    res.locals.user = null; 
-    console.log(res.locals.user)
+    res.locals.user = null;
     next();
   }
 };

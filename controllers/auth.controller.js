@@ -21,7 +21,12 @@ module.exports.signUp = async (req,res) => {
   }
    try {
     const user = await UserModel.create({pseudo, email, trustedEmail, password, secretAnswer, secretQuestion, picture});
-    res.status(201).json({user: user._id})
+    res.status(201).json({
+                user: user._id, 
+                name: user.name,
+                pseudo: user.pseudo,
+                email: user.email,
+                pic: user.picture,})
    }
    catch (err) {
     const errors = signUpErrors(err);
@@ -36,7 +41,16 @@ module.exports.signIn = async (req, res) => {
       user.isonline = true;
       const token = createToken(user._id);
       res.cookie('jwt', token, {httpOnly: true, maxAge});
-      res.status(200).json({user: user._id})
+      res.status(200).json({user: user._id,
+                name: user.name,
+                pseudo:user.pseudo,
+                email: user.email,
+                picture: user.picture,
+                trustedEmail: user.trustedEmail,
+                secretQuestion: user.secretQuestion,
+                secretAnswer: user.secretAnswer,
+                isOnline: user.isOnline,
+              })
    }
    catch (err) {
       const errors = signInErrors(err);
@@ -45,7 +59,7 @@ module.exports.signIn = async (req, res) => {
 }
 
 module.exports.logOut = (req, res) => {
-  const user = req.user;
+  const {user} = req;
    if (user) {
       user.isOnline = false; // Set isOnline to false
    }

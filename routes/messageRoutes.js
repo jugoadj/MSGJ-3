@@ -23,11 +23,12 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 const router = express.Router();
+// const checkUser = require("../middleware/auth.middleware");
 
 
-router.route("/").post(sendMessage);
-router.route("/transfere").post( transferMessage);
-router.post("/upload", upload.single('file'),  sendFiles); //upload.single('file') : permet de stocker l'image dans le dossier uploads
+router.route("/:_id").post(sendMessage);
+router.route("/transfere/:_id").post(transferMessage);
+router.post("/upload/:_id", upload.single('file'),  sendFiles); //upload.single('file') : permet de stocker l'image dans le dossier uploads
 
 //quand on fais une requête post vers /api/message/upload on va appeler la fonction sendMessage mais 
 //on va stocker limage en static et on va enregistrer le chemin de limage dans la base de données

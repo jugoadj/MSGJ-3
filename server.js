@@ -15,7 +15,7 @@ const app = express();
 const corsOptions = { 
     origin: process.env.CLIENT_URL,
     credentials: true,
-    'allowedHeaders': ['sessionId', 'Content-Type', 'Authorization'],
+    'allowedHeaders': ['sessionId', 'Content-Type'],
     'exposedHeaders': ['sessionId'],
     'methods': 'GET,HEAD,PUT,PATCH,POST,DELETE',
     'preflightContinue': false
@@ -59,6 +59,7 @@ const io = require("socket.io")(server, { //initialise Socket.IO sur le serveur 
 
 io.on("connection", (socket) => { // fonction est exécutée chaque fois qu'un client se connecte au serveur
   console.log("Connected to socket.io");
+  
   socket.on("setup", (userData) => { //lorsque le client se connecte, il envoie un événement "setup" au serveur avec les données de l'utilisateur
     //userData est un objet contenant des informations sur l'utilisateur qui s'est connecté. Cet objet est envoyé par le 
     //client lorsqu'il émet l'événement "setup"
