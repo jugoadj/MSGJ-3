@@ -191,7 +191,7 @@ function dataURItoBlob(dataURI) {
                      
                         m.content.startsWith('data:audio') ? (
                         <div style={{ position: 'relative', width: '175px', height: '100%', borderRadius:"10px 10px 10px 10px" }}>
-                          <audio style={{ width: '100%', height: '100%' }} controls>
+                          <audio style={{ width: '100%', height: '40px' }} controls>
                             <source src={m.content} />
                           </audio>
                         </div>
