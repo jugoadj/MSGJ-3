@@ -132,6 +132,8 @@ function dataURItoBlob(dataURI) {
 
               <span
                 style={{
+                 marginRight: m.sender._id === user._id ? '10px' : '0',
+                 marginLeft: m.sender._id !== user._id ? '10px' : '0',
                 backgroundColor: `${
                   m.file ? (
                     fileType === 'image' ? 'transparent' : 

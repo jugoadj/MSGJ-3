@@ -98,7 +98,7 @@ const createGroupChat = asyncHandler(async (req, res) => {
       .send("More than 2 users are required to form a group chat");
   }
 
-  users.push(req.params.user);// on ajoute l'utilisateur actuellement connecté au groupe
+  users.push(req.params._id);// on ajoute l'utilisateur actuellement connecté au groupe
 
   //res.locals.user est l'utilisateur actuellement connecté.(authentifié) qu'on a stocker dans res.locals.user grace au middleware protect
 
@@ -108,7 +108,7 @@ const createGroupChat = asyncHandler(async (req, res) => {
       chatName: req.body.name,
       users: users,
       isGroupChat: true,
-      groupAdmin: res.locals.user, // l'utilisateur actuellement connecté est l'administrateur du groupe
+      groupAdmin: req.params._id, // l'utilisateur actuellement connecté est l'administrateur du groupe
     });
 
     const fullGroupChat = await Chat.findOne({ _id: groupChat._id })// on recupere le groupe qu'on vient de creer dans la base de données

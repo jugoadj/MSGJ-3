@@ -14,8 +14,7 @@ import { SelectedChatContext } from '../../Context/ChatProvider';
 import { TextField } from "@mui/material";
 import { Button } from "@mui/material";
 import CreateGroupForm from "./GroupChat";
-
-
+import GroupChatModal from "./GroupChat";
 
 
 
@@ -26,10 +25,11 @@ import CreateGroupForm from "./GroupChat";
 
 const StyledDrawer = styled(Drawer)`
     margin-top: 54px;
+    
 `
 
 const SideBar = ({ toggleDrawer, openDrawer}) => {
-      const [showForm, setShowForm] = useState(false);
+      const [isOpen, setIsOpen] = useState(false);
 
     const apiUrl = process.env.REACT_APP_API_URL;
     const [loggedUser, setLoggedUser] = useState();//crée un état loggedUser avec une valeur initiale non définie. setLoggedUser est la fonction qui sera utilisée pour mettre à jour cet état
@@ -41,54 +41,40 @@ const SideBar = ({ toggleDrawer, openDrawer}) => {
 
     const [chatName, setChatName] = useState('');
 
-//        const createGroup = () => {
-//         try {
+     const handleClick = () => {
+    setIsOpen(true);
+  };
 
-//             setLoading(true);
+  const handleClose = () => {
+    setIsOpen(false);
+    };
 
-//             const { data } = axios.post(
-//                 `${apiUrl}api/chat/group/${uid}`,
-//                 { userId , chatName }
-
-                
-//             );
-//             setChats([data, ...chats]);
-//             setSelectedChat(data);
-//             setLoading(false);
-//         }
-//         catch (error) {
-//             console.error(error);
-//         }
-    
-//   };
-
-   
 
     const fetchChats = useCallback(async () => {
           setLoading(true);
 
-    if (!uid) { 
-        console.error("UID is not defined");
-        return;
-    }
+        if (!uid) { 
+            console.error("UID is not defined");
+            return;
+        }
 
-    try {
-        const response = await axios.get(`${apiUrl}api/chat/${uid}`);
-        setChats(response.data);
-        console.log("uid ilehouuuuuuuuuuuuuz", uid);
-        console.log("response.data ilehouuuuuuuuuuuuuz", response.data);
-        setLoading(false);
-        
-    } catch (error) {
-        console.error("Error fetching chats jugoooo:", error);
-    }
-}, [uid, apiUrl]);
+        try {
+            const response = await axios.get(`${apiUrl}api/chat/${uid}`);
+            setChats(response.data);
+            console.log("uid ilehouuuuuuuuuuuuuz", uid);
+            console.log("response.data ilehouuuuuuuuuuuuuz", response.data);
+            setLoading(false);
+            
+        } catch (error) {
+            console.error("Error fetching chats jugoooo:", error);
+        }
+    }, [uid, apiUrl]);
 
-useEffect(() => {
-    if (uid) {
-        fetchChats();
-    }
-}, [fetchChats, uid]);
+    useEffect(() => {
+        if (uid) {
+            fetchChats();
+        }
+    }, [fetchChats, uid]);
 
 
 
@@ -113,6 +99,10 @@ useEffect(() => {
                     background: '#f5F5F5',
                     marginTop: '62px',
                     height: 'calc(100vh - 64px)',
+                        position: 'fixed',
+
+                
+                
                 },
             }}
         >
@@ -128,13 +118,12 @@ useEffect(() => {
             >
                 My Chats
                 
-                 <div>
-                <Fab margin="5px" color="black" aria-label="add" display="flex" onClick={() => setShowForm(true)}>
-                    <AddIcon style={{ color: 'black' }} />
-                </Fab>
-
-                {/* {showForm && <CreateGroupForm createGroup={createGroup} />} */}
-                </div>
+    <div>
+      <Fab margin="5px" color="black" aria-label="add" display="flex" onClick={handleClick}>
+        <AddIcon style={{ color: 'black' }} />
+      </Fab>
+  {isOpen && <GroupChatModal isOpen={isOpen} onClose={handleClose} />}
+    </div>
                             
             </Box>
             <Box sx={{ width: 300, height: '100%', overflow: 'auto' }}>
@@ -154,14 +143,18 @@ useEffect(() => {
                         chats.map((chat) => (
                             <div 
                                 key={chat._id} 
-                                        style={{ border: '1px solid #ccc', padding: '10px', margin: '10px', borderRadius: '5px' }}
-
+                            style={{ 
+                            border: '1px solid #ccc', 
+                            padding: '10px', 
+                            margin: '10px', 
+                            borderRadius: '5px' , 
+                            backgroundColor: selectedChat?._id === chat._id ? '#b1b1b1' : '#f5f5f5'
+                            }}
 
 
                                 onClick={() => setSelectedChat(chat) }
                                  
                             >
-                                <h1>{chat.isGroupChat ? chat.chatName : getSender(loggedUser, chat.users)}</h1>
                                 <div className="chat">
                                     <div className="chat__details">
                                         <div className="chat__name">
@@ -215,18 +208,55 @@ useEffect(() => {
                                                             </div>}
                                                 </span> 
                                             ) : chat.latestMessage ? (
-                                                <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                                    <p style={{fontFamily:"fantasy"}} >{chat.users.find(user => user._id !== uid).pseudo}</p>
-                                                    <img src={chat.users.find(user => user._id !== uid).picture} style={{width: '30px', height: '30px', marginRight: '5px', borderRadius:"100%" }} />
-                                                    {chat.latestMessage.sender._id === uid 
+                                                chat.isGroupChat ? (
+                                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+                                                    <p style={{fontFamily:"georgia"}}>{chat.chatName}</p>
+                                                    <div style={{ position: 'relative', width: '30px', height: '30px', alignSelf: 'center' , marginBottom:"10px" }}>
+                                                       {chat.users.slice(0, 3).map((user, index) => (
+                                                            <img 
+                                                                key={user._id}
+                                                                src={user.picture} 
+                                                                alt="User avatar"
+                                                                style={{ 
+                                                                borderRadius: '100%', 
+                                                                width: '30px', 
+                                                                height: '30px', 
+                                                                position: 'absolute', 
+                                                                top: `${index * 5}px`, 
+                                                                left: `${index * 5}px`
+                                                                }}
+                                                            />
+                                                            ))}
+                                                    </div>
+                                                    <p>
+                                                        {chat.latestMessage.sender._id === uid 
                                                         ? "Vous"
                                                         : chat.latestMessage.sender.pseudo} 
-                                                    : {chat.latestMessage.content.length > 50 
+                                                        : {chat.latestMessage.content.length > 50 
+                                                        ? chat.latestMessage.content.substring(0, 35) + "..." 
+                                                        : chat.latestMessage.content}
+                                                    </p>
+                                                    </div>
+                                                    ) : (
+                                                    <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                                        <p style={{fontFamily:"georgia"}} >{chat.users.find(user => user._id !== uid).pseudo}</p>
+                                                        <img src={chat.users.find(user => user._id !== uid).picture} style={{width: '30px', height: '30px', marginRight: '5px', borderRadius:"100%" }} />
+                                                        {chat.latestMessage.sender._id === uid 
+                                                        ? "Vous"
+                                                        : chat.latestMessage.sender.pseudo} 
+                                                        : {chat.latestMessage.content.length > 50 
                                                         ? chat.latestMessage.content.substring(0, 35) + "..." 
                                                         : chat.latestMessage.content}
                                                     </span>
-                                            ) : `Démarrer une conversation avec 
-                                                ${chat.users.find(user => user._id !== uid).pseudo}`}
+                                                    )
+                                            ) : (
+                                                <span style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}} >
+                                                {chat.isGroupChat 
+                                                    ? <>Démarrer une conversation avec : <p style={{fontFamily:"georgia"}}>{chat.chatName}</p></>
+                                                    : <>Démarrer une conversation avec : <p style={{fontFamily:"georgia"}}>{chat.users.find(user => user._id !== uid).pseudo}</p></> }
+                                                </span>
+                                            )}
+                                            
                                         </div>
                                     </div>
                                 </div>

@@ -34,7 +34,7 @@ useEffect(() => {
   
     fetchUserPseudo();
   
-}, [uid]); // Ajoutez uid comme dépendance à useEffect
+}, [uid]);
 
   return (
     <SelectedChatContext.Provider value={{ selectedChat, setSelectedChat, chats, setChats, loading, setLoading , user, setUser}}>

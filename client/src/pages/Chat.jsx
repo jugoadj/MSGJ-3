@@ -10,7 +10,6 @@ import SingleChat from '../components/chats/Chats';
 const Wrapper = styled(Box)`
   display: flex;
   position: relative;
-
   width: 100%;
 `;
 

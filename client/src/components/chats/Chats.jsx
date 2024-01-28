@@ -123,10 +123,10 @@ const fetchMessages = async () => {
     if (user) {
       socket.emit("setup", user);
     } else {
-      console.log("User is not defined");
+      console.log("User is not defined"); 
     }
     socket.on("connection", () => setSocketConnected(true)); // gestionnaire d'événements pour l'événement "connection" qui met à jour l'état socketConnected à true lorsque la connexion est établie
-  }, []);
+  }, [user]);
 
  useEffect(() => { // exécuté la fonction fetchMessages chaque fois que selectedChat change
     fetchMessages(); 
@@ -224,32 +224,48 @@ return (
 <div>
 {selectedChat ? (
   <div className="chat-container">
-    <div className="chat-header"style={{ display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-       <p>
+   <div className="chat-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+  <p>
     <span className={`status ${user.isonline ? 'online' : 'offline'}`}></span>
     {user.isonline ? 'En ligne' : 'Hors ligne'}
   </p>
-   <h2 style={{ textAlign: 'center', paddingLeft:"10px"}}>
-            {selectedChat.users.filter(user => user._id !== uid)[0]?.pseudo}
-          </h2>
-    </div>
+  <h2 style={{ textAlign: 'center', paddingLeft: "10px" }}>
+    {selectedChat.isGroupChat 
+      ? selectedChat.chatName 
+      : selectedChat.users.filter(user => user._id !== uid)[0]?.pseudo
+    }
+  </h2>
+</div>
 
     <div className="content-container" style={{ overflowY: 'auto', maxHeight: "420px" }}>
-      <div className='souheader' >
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div className='souheader'>
+  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    {selectedChat.isGroupChat ? (
+      <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+        {selectedChat.users.slice(0, 4).map(user => (
           <img 
-            src={selectedChat.users.find(user => user._id !== uid)?.picture} 
+            key={user._id}
+            src={user.picture} 
             alt="User avatar"
-            style={{ borderRadius: '50%', width: '100px', height: '100px' }}
+            style={{ borderRadius: '50%', width: '25px', height: '25px' }}
           />
-          <h2 style={{ textAlign: 'center' }}>
-            {selectedChat.users.filter(user => user._id !== uid)[0]?.pseudo}
-          </h2>
-          <p style={{ textAlign: 'center' }}>
-            {new Date(selectedChat.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
-          </p>
-        </div>
+        ))}
       </div>
+    ) : (
+      <img 
+        src={selectedChat.users.find(user => user._id !== uid)?.picture} 
+        alt="User avatar"
+        style={{ borderRadius: '50%', width: '100px', height: '100px' }}
+      />
+    )}
+    <h2 style={{ textAlign: 'center' }}>
+      {selectedChat.isGroupChat ? selectedChat.chatName : selectedChat.users.filter(user => user._id !== uid)[0]?.pseudo}
+    </h2>
+    <p style={{ textAlign: 'center' }}>
+      {new Date(selectedChat.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+    </p>
+  </div>
+</div>
       <div className='messages'>
         <ScrollableChat messages={messages}  />
       </div>

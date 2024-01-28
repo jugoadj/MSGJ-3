@@ -115,7 +115,7 @@ console.log(open)
           }
         };
     
-        if (uid) { // Ajoutez cette vérification
+        if (uid) { 
         fetchUserPseudo();
       }
       }, [uid]);
